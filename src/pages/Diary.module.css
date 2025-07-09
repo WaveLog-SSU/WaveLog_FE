@@ -1,0 +1,127 @@
+.column {
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+.contain {
+	display: flex;
+	flex-direction: column;
+	background: #FFFFFF;
+}
+.image {
+	width: 45px;
+	height: 45px;
+	margin-right: 18px;
+	object-fit: fill;
+}
+.image2 {
+	width: 45px;
+	height: 45px;
+	margin-right: 15px;
+	object-fit: fill;
+}
+.image3 {
+	width: 45px;
+	height: 45px;
+	object-fit: fill;
+}
+.input {
+	color: #000000;
+	font-size: 48px;
+	margin-bottom: 22px;
+	background: #FFFFFF;
+	border-radius: 50px;
+	border: none;
+	padding: 51px 49px;
+	box-shadow: -1px -1px 45px #00000026;
+}
+.row-view {
+	display: flex;
+	align-items: flex-start;
+	margin-bottom: 119px;
+	margin-left: 67px;
+}
+.row-view2 {
+	display: flex;
+	align-items: center;
+	margin-bottom: 16px;
+	margin-left: 11px;
+}
+.row-view3 {
+	display: flex;
+	align-items: center;
+	margin-bottom: 22px;
+	margin-left: 11px;
+}
+.row-view4 {
+	display: flex;
+	align-items: center;
+	margin-left: 74px;
+	gap: 25px;
+}
+.row-view5 {
+	display: flex;
+	align-items: center;
+	margin-left: 126px;
+	gap: 25px;
+}
+.scroll-view {
+	height: 1024px;
+	align-self: stretch;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	background: #FFFFFF;
+}
+.text {
+	color: #000000;
+	font-size: 24px;
+}
+.text2 {
+	color: #000000;
+	font-size: 48px;
+}
+.text3 {
+	color: #000000;
+	font-size: 96px;
+}
+.text4 {
+	color: #000000;
+	font-size: 48px;
+	margin-bottom: 42px;
+}
+.text5 {
+	color: #000000;
+	font-size: 36px;
+	margin-right: 220px;
+}
+.text6 {
+	color: #000000;
+	font-size: 32px;
+	margin-right: 25px;
+}
+.text7 {
+	color: #000000;
+	font-size: 32px;
+}
+.view {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding-bottom: 1px;
+	margin-top: 34px;
+	margin-bottom: 124px;
+	margin-left: 47px;
+}
+.view2 {
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	background: #FFFFFF;
+	border-radius: 125px;
+	padding: 81px 471px 574px 71px;
+	margin-right: 78px;
+	box-shadow: -1px -1px 45px #00000026;
+}
