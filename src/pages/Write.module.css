@@ -38,7 +38,7 @@
 }
 
 /* 댓글 UI 스타일 - 로그인 UI 느낌 최대한 살림 */
-.comment-box {
+.commentList {
   width: 100%;
   max-width: 600px; /* 두 번째 코드 max-width 유지 */
   background: #FFFFFF;
@@ -52,7 +52,7 @@
   box-sizing: border-box;
 }
 
-.comment-header {
+.commentHeader {
   font-size: 32px; /* 첫 번째 코드 크기 유지 */
   font-weight: 900; /* 첫 번째 코드 굵기 유지 */
   color: #222222;
@@ -60,7 +60,7 @@
   margin-bottom: 20px; /* 첫 번째 코드 margin 유지 */
 }
 
-.comment-input {
+.commentContent {
   width: 100%;
   min-height: 100px; /* 두 번째 코드 min-height 유지 (textarea에 적합) */
   padding: 15px 20px; /* 두 번째 코드 padding 유지 */
@@ -76,12 +76,12 @@
   line-height: 1.4;
 }
 
-.comment-input::placeholder {
+.commentContent::placeholder {
   color: #aaa;
   font-style: italic;
 }
 
-.comment-input:focus {
+.commentContent:focus {
   border-color: #888888;
   background-color: #ffffff;
 }
@@ -131,30 +131,11 @@
   white-space: pre-wrap;
 }
 
-/* 댓글 작성 날짜 */
-.comment-date {
-  font-size: 14px;
-  color: #999999;
-  text-align: right;
-}
-
 /* 이미지 관련 클래스 통합 */
 .image, .image2, .image3 {
   width: 45px;
   height: 45px;
   object-fit: fill;
-}
-
-.image {
-  margin-right: 18px;
-}
-
-.image2 {
-  margin-right: 15px;
-}
-
-.image3 {
-  margin-right: 0;
 }
 
 .input {

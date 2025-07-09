@@ -22,7 +22,7 @@ function Heart({ filled, onClick }) {
   );
 }
 
-function Scrap() {
+function Scrap({ diaryId }) {
   const [heartCount, setHeartCount] = useState(0);
   const [heartFilled, setHeartFilled] = useState(false);
   const [comments, setComments] = useState([]);
@@ -33,6 +33,41 @@ function Scrap() {
   const [menuOpen, setMenuOpen] = useState({});
 
   const currentUserId = "어드민";
+
+  // API 함수들
+  async function fetchComments(diaryId) {
+    const res = await fetch(`/api/diaries/${diaryId}/comments`);
+    if (!res.ok) throw new Error("댓글을 불러오는데 실패했습니다.");
+    const data = await res.json();
+    return data;
+  }
+
+  async function postComment(diaryId, content, parentCommentId = null) {
+    const res = await fetch(`/api/diaries/${diaryId}/comments`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content, parentCommentId }),
+    });
+    if (!res.ok) throw new Error("댓글 작성 실패");
+    return await res.json();
+  }
+
+  async function updateComment(commentId, newContent) {
+    const res = await fetch(`/api/comments/${commentId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content: newContent }),
+    });
+    if (!res.ok) throw new Error("댓글 수정 실패");
+    return await res.json();
+  }
+
+  async function deleteComment(commentId) {
+    const res = await fetch(`/api/comments/${commentId}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) throw new Error("댓글 삭제 실패");
+  }
 
   // 하트 상태 초기화 (localStorage)
   useEffect(() => {
@@ -47,6 +82,14 @@ function Scrap() {
     }
   }, []);
 
+  // 댓글 목록 불러오기
+  useEffect(() => {
+    if (!diaryId) return;
+    fetchComments(diaryId)
+      .then((data) => setComments(data))
+      .catch((e) => console.error(e));
+  }, [diaryId]);
+
   const handleHeartClick = () => {
     const updatedFilled = !heartFilled;
     const updatedCount = updatedFilled ? heartCount + 1 : heartCount - 1;
@@ -57,23 +100,16 @@ function Scrap() {
     localStorage.setItem("heartCount", updatedCount.toString());
   };
 
-  const createComment = (content, parentCommentId = null) => {
-    const newComment = {
-      id: Date.now(),
-      content,
-      parentCommentId,
-      name: currentUserId,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    setComments((prev) => [...prev, newComment]);
-  };
-
-  const handleCommentSubmit = (e) => {
+  const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    if (commentInput.trim()) {
-      createComment(commentInput.trim());
+    if (!commentInput.trim()) return;
+
+    try {
+      const newComment = await postComment(diaryId, commentInput.trim());
+      setComments((prev) => [...prev, newComment]);
       setCommentInput("");
+    } catch (e) {
+      alert(e.message);
     }
   };
 
@@ -81,12 +117,17 @@ function Scrap() {
     setReplyInputs((prev) => ({ ...prev, [commentId]: value }));
   };
 
-  const handleReplySubmit = (e, parentId) => {
+  const handleReplySubmit = async (e, parentId) => {
     e.preventDefault();
     const replyText = replyInputs[parentId];
-    if (replyText?.trim()) {
-      createComment(replyText.trim(), parentId);
+    if (!replyText?.trim()) return;
+
+    try {
+      const newReply = await postComment(diaryId, replyText.trim(), parentId);
+      setComments((prev) => [...prev, newReply]);
       setReplyInputs((prev) => ({ ...prev, [parentId]: "" }));
+    } catch (e) {
+      alert(e.message);
     }
   };
 
@@ -100,25 +141,32 @@ function Scrap() {
     setEditInputs((prev) => ({ ...prev, [commentId]: value }));
   };
 
-  const handleEditSubmit = (commentId) => {
+  const handleEditSubmit = async (commentId) => {
     const newContent = editInputs[commentId]?.trim();
     if (!newContent) return;
 
-    setComments((prev) =>
-      prev.map((c) =>
-        c.id === commentId
-          ? { ...c, content: newContent, updatedAt: new Date().toISOString() }
-          : c
-      )
-    );
-    setEditStates((prev) => ({ ...prev, [commentId]: false }));
+    try {
+      const updatedComment = await updateComment(commentId, newContent);
+      setComments((prev) =>
+        prev.map((c) => (c.id === commentId ? updatedComment : c))
+      );
+      setEditStates((prev) => ({ ...prev, [commentId]: false }));
+    } catch (e) {
+      alert(e.message);
+    }
   };
 
-  const handleDelete = (commentId) => {
-    setComments((prev) =>
-      prev.filter((c) => c.id !== commentId && c.parentCommentId !== commentId)
-    );
-    setMenuOpen((prev) => ({ ...prev, [commentId]: false }));
+  const handleDelete = async (commentId) => {
+    if (!window.confirm("댓글을 삭제하시겠습니까?")) return;
+    try {
+      await deleteComment(commentId);
+      setComments((prev) =>
+        prev.filter((c) => c.id !== commentId && c.parentCommentId !== commentId)
+      );
+      setMenuOpen((prev) => ({ ...prev, [commentId]: false }));
+    } catch (e) {
+      alert(e.message);
+    }
   };
 
   const toggleMenu = (commentId) => {
@@ -170,10 +218,7 @@ function Scrap() {
             </div>
 
             {/* 댓글 입력폼 */}
-            <form
-              onSubmit={handleCommentSubmit}
-              className={styles.commentForm}
-            >
+            <form onSubmit={handleCommentSubmit} className={styles.commentForm}>
               <input
                 type="text"
                 placeholder="댓글 작성"
@@ -250,9 +295,7 @@ function Scrap() {
                             <input
                               type="text"
                               value={editInputs[r.id] || ""}
-                              onChange={(e) =>
-                                handleEditChange(r.id, e.target.value)
-                              }
+                              onChange={(e) => handleEditChange(r.id, e.target.value)}
                               className={styles.editInput}
                             />
                             <button
@@ -303,12 +346,12 @@ function Scrap() {
                     >
                       <input
                         type="text"
-                        placeholder="대댓글 작성"
+                        placeholder="답글 작성"
                         value={replyInputs[c.id] || ""}
                         onChange={(e) => handleReplyChange(c.id, e.target.value)}
                         className={styles.replyInput}
                       />
-                      <button type="submit" className={styles.commentBtn}>
+                      <button type="submit" className={styles.replyBtn}>
                         작성
                       </button>
                     </form>
