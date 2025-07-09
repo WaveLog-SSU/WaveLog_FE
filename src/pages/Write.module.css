@@ -1,0 +1,250 @@
+/* 전체 컨테이너 및 레이아웃 */
+.container {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* 수직 중앙 정렬 */
+  align-items: center;     /* 수평 중앙 정렬 */
+  
+  background: #FFFFFF;
+  overflow: auto;
+}
+
+.scroll-view {
+  flex: 1; /* 남은 공간 다 차지 */
+  width: 100%;
+  overflow-y: auto; /* 내용 넘칠 때 세로 스크롤 */
+  
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: #FFFFFF;
+}
+
+.column {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* CATEGORY 텍스트를 볼드체로 */
+.category {
+  font-weight: bold;
+}
+
+/* 댓글 UI 스타일 - 로그인 UI 느낌 최대한 살림 */
+.comment-box {
+  width: 100%;
+  max-width: 600px; /* 두 번째 코드 max-width 유지 */
+  background: #FFFFFF;
+  border-radius: 25px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* 첫 번째 그림자 강도 조금 줄임 */
+  padding: 30px 40px; /* 첫 번째 padding 유지 */
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* 첫 번째 gap */
+  margin-top: 20px;
+  box-sizing: border-box;
+}
+
+.comment-header {
+  font-size: 32px; /* 첫 번째 코드 크기 유지 */
+  font-weight: 900; /* 첫 번째 코드 굵기 유지 */
+  color: #222222;
+  text-align: center;
+  margin-bottom: 20px; /* 첫 번째 코드 margin 유지 */
+}
+
+.comment-input {
+  width: 100%;
+  min-height: 100px; /* 두 번째 코드 min-height 유지 (textarea에 적합) */
+  padding: 15px 20px; /* 두 번째 코드 padding 유지 */
+  border: 1px solid #ccc;
+  border-radius: 30px;
+  font-size: 18px;
+  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+  outline: none;
+  background-color: #fafafa; /* 두 번째 코드 배경색 유지 */
+  color: #222222; /* 첫 번째 코드 텍스트 색 유지 */
+  line-height: 1.4;
+}
+
+.comment-input::placeholder {
+  color: #aaa;
+  font-style: italic;
+}
+
+.comment-input:focus {
+  border-color: #888888;
+  background-color: #ffffff;
+}
+
+.comment-submit-btn {
+  align-self: flex-end; /* 두 번째 코드 버튼 우측 정렬 */
+  width: 120px; /* 두 번째 코드 너비 유지 */
+  height: 50px; /* 첫 번째 코드 버튼 높이 유지 */
+  background-color: #d9d9d9;
+  border: none;
+  border-radius: 30px;
+  font-size: 18px;
+  font-weight: 900; /* 첫 번째 코드 굵기 유지 */
+  color: #222222;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 10px; /* 첫 번째 코드 margin 유지 */
+}
+
+.comment-submit-btn:hover {
+  background-color: #c0c0c0;
+}
+
+/* 개별 댓글 영역 */
+.comment-item {
+  background-color: #ffffff;
+  border-radius: 30px;
+  padding: 15px 25px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 댓글 작성자 이름 */
+.comment-author {
+  font-weight: 700;
+  font-size: 18px;
+  color: #222222;
+}
+
+/* 댓글 내용 */
+.comment-text {
+  font-size: 16px;
+  color: #555555;
+  white-space: pre-wrap;
+}
+
+/* 댓글 작성 날짜 */
+.comment-date {
+  font-size: 14px;
+  color: #999999;
+  text-align: right;
+}
+
+/* 이미지 관련 클래스 통합 */
+.image, .image2, .image3 {
+  width: 45px;
+  height: 45px;
+  object-fit: fill;
+}
+
+.image {
+  margin-right: 18px;
+}
+
+.image2 {
+  margin-right: 15px;
+}
+
+.image3 {
+  margin-right: 0;
+}
+
+.input {
+  color: #000000;
+  font-size: 48px;
+  margin-bottom: 22px;
+  background: #FFFFFF;
+  border-radius: 50px;
+  border: none;
+  padding: 51px 49px;
+  box-shadow: -1px -1px 45px #00000026;
+}
+
+.row-view, .row-view2, .row-view3, .row-view4, .row-view5 {
+  display: flex;
+  align-items: center;
+}
+
+.row-view {
+  align-items: flex-start;
+  margin-bottom: 119px;
+  margin-left: 67px;
+}
+
+.row-view2 {
+  margin-bottom: 16px;
+  margin-left: 11px;
+}
+
+.row-view3 {
+  margin-bottom: 22px;
+  margin-left: 11px;
+}
+
+.row-view4 {
+  margin-left: 74px;
+  gap: 25px;
+}
+
+.row-view5 {
+  margin-left: 126px;
+  gap: 25px;
+}
+
+/* 텍스트 크기 및 색상 통합 */
+.text, .text2, .text4, .text6, .text7 {
+  color: #000000;
+}
+
+.text {
+  font-size: 24px;
+}
+
+.text2, .text4 {
+  font-size: 48px;
+}
+
+.text3 {
+  color: #000000;
+  font-size: 96px;
+}
+
+.text5 {
+  color: #000000;
+  font-size: 36px;
+  margin-right: 220px;
+}
+
+.text6 {
+  margin-right: 25px;
+}
+
+.view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 1px;
+  margin-top: 34px;
+  margin-bottom: 124px;
+  margin-left: 47px;
+}
+
+.view2 {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: #FFFFFF;
+  border-radius: 125px;
+  padding: 81px 471px 574px 71px;
+  margin-right: 78px;
+  box-shadow: -1px -1px 45px #00000026;
+}
