@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Calendar from "../components/Calendar";
-import EditModal from "../components/EditModal";  // 모달 임포트
+import EditModal from "../components/EditModal";
 import styles from "./MainScreen.module.css";
 
 const profileImg =
@@ -12,20 +12,42 @@ function MainScreen() {
 
   const [modalOpen, setModalOpen] = useState(false);
 
+  const [selectedDiaryId, setSelectedDiaryId] = useState(null);
+  const [title, setTitle] = useState("");
+  const [code, setCode] = useState("");
+  const [desc, setDesc] = useState("");
+  const [category, setCategory] = useState("CATEGORY");
+  const [hashtags, setHashtags] = useState([]);
+
   const goToProfile = () => {
-    navigate("/profile"); // 프로필 페이지로 이동
+    navigate("/profile");
   };
 
-  const openModal = () => {
+  const openModal = (diary = null) => {
+    if (diary) {
+      setSelectedDiaryId(diary.diary_id);
+      setTitle(diary.title);
+      setCode(diary.code);
+      setDesc(diary.content);
+      setCategory(diary.category);
+      setHashtags(diary.hashtags || []);
+    } else {
+      setSelectedDiaryId(null);
+      setTitle("");
+      setCode("");
+      setDesc("");
+      setCategory("CATEGORY");
+      setHashtags([]);
+    }
     setModalOpen(true);
   };
+
   const closeModal = () => {
     setModalOpen(false);
   };
 
   const handleSave = (data) => {
     console.log("저장된 데이터:", data);
-    // 여기서 저장 로직 추가 가능
     closeModal();
   };
 
@@ -33,16 +55,22 @@ function MainScreen() {
     <div className={styles.container}>
       {/* 왼쪽 섹션: 메뉴 + 콘텐츠 박스 */}
       <div className={styles.leftSection}>
-        <div className={styles.topMenu}>
-          <button className={styles.menuItem}>SCRAP</button>
-          <button className={styles.menuItem}>SEARCH</button>
-          <button className={styles.menuItem} onClick={openModal}>
-            +
+        {/* 상단 메뉴 버튼들 */}
+        <div className={styles.topTextMenu}>
+          <button className={styles.myButton} onClick={() => navigate("/List")}>
+            LIST
+          </button>
+          <button className={styles.myButton} onClick={() => navigate("/Bookmark")}>
+            BOOKMARK
+          </button>
+          <button className={styles.myButton} onClick={() => navigate("/Search")}>
+            SEARCH
+          </button>
+          <button className={styles.myButton} onClick={() => openModal()}>
+            WRITE
           </button>
         </div>
       </div>
-
-      <div className={styles.contentBox} />
 
       {/* 오른쪽 섹션: 프로필 이미지 + 캘린더 */}
       <div className={styles.rightSection}>
@@ -52,8 +80,18 @@ function MainScreen() {
         <Calendar />
       </div>
 
-      {/* 모달 */}
-      <EditModal isOpen={modalOpen} onClose={closeModal} onSave={handleSave} />
+      {/* 모달: 편집 데이터와 함께 호출 */}
+      <EditModal
+        isOpen={modalOpen}
+        onClose={closeModal}
+        onSave={handleSave}
+        diaryId={selectedDiaryId}
+        initialTitle={title}
+        initialCode={code}
+        initialDesc={desc}
+        initialCategory={category}
+        initialHashtags={hashtags}
+      />
     </div>
   );
 }

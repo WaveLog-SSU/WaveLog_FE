@@ -16,7 +16,7 @@ function Login() {
     }
 
     try {
-      const response = await axios.post("/api/members/login", {
+      const response = await axios.post("http://localhost:8080/api/members/login", {
         wavelogId: userId,
         password: password,
       });

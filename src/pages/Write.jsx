@@ -1,5 +1,14 @@
 import styles from "./Write.module.css";
 import React, { useState, useEffect } from "react";
+import api from "../api";
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = token;
+  }
+  return config;
+});
 
 function Heart({ filled, onClick }) {
   return (
@@ -22,7 +31,10 @@ function Heart({ filled, onClick }) {
   );
 }
 
-function Scrap({ diaryId }) {
+function Write({ diaryId }) {
+  console.log("diaryId:", diaryId); // diaryId 확인용
+
+  // 상태 관리
   const [heartCount, setHeartCount] = useState(0);
   const [heartFilled, setHeartFilled] = useState(false);
   const [comments, setComments] = useState([]);
@@ -32,44 +44,55 @@ function Scrap({ diaryId }) {
   const [editInputs, setEditInputs] = useState({});
   const [menuOpen, setMenuOpen] = useState({});
 
-  const currentUserId = "어드민";
+  const currentUserId = localStorage.getItem("currentUserId");
 
-  // API 함수들
+  // 댓글 불러오기
   async function fetchComments(diaryId) {
-    const res = await fetch(`/api/diaries/${diaryId}/comments`);
-    if (!res.ok) throw new Error("댓글을 불러오는데 실패했습니다.");
-    const data = await res.json();
-    return data;
+    if (!diaryId) return [];
+    try {
+      const res = await api.get(`/diaries/${diaryId}/comments`);
+      return res.data;
+    } catch (error) {
+      console.error("댓글을 불러오는데 실패했습니다.", error);
+      return [];
+    }
   }
 
+  // 댓글 작성
   async function postComment(diaryId, content, parentCommentId = null) {
-    const res = await fetch(`/api/diaries/${diaryId}/comments`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content, parentCommentId }),
-    });
-    if (!res.ok) throw new Error("댓글 작성 실패");
-    return await res.json();
+    try {
+      const res = await api.post(`/diaries/${diaryId}/comments`, {
+        content,
+        parentCommentId,
+      });
+      return res.data;
+    } catch {
+      throw new Error("댓글 작성 실패");
+    }
   }
 
+  // 댓글 수정
   async function updateComment(commentId, newContent) {
-    const res = await fetch(`/api/comments/${commentId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: newContent }),
-    });
-    if (!res.ok) throw new Error("댓글 수정 실패");
-    return await res.json();
+    try {
+      const res = await api.put(`/comments/${commentId}`, {
+        content: newContent,
+      });
+      return res.data;
+    } catch {
+      throw new Error("댓글 수정 실패");
+    }
   }
 
+  // 댓글 삭제
   async function deleteComment(commentId) {
-    const res = await fetch(`/api/comments/${commentId}`, {
-      method: "DELETE",
-    });
-    if (!res.ok) throw new Error("댓글 삭제 실패");
+    try {
+      await api.delete(`/comments/${commentId}`);
+    } catch {
+      throw new Error("댓글 삭제 실패");
+    }
   }
 
-  // 하트 상태 초기화 (localStorage)
+  // 처음 마운트 시 하트 상태 불러오기
   useEffect(() => {
     const storedHeartCount = localStorage.getItem("heartCount");
     const storedHeartFilled = localStorage.getItem("heartFilled");
@@ -82,45 +105,56 @@ function Scrap({ diaryId }) {
     }
   }, []);
 
-  // 댓글 목록 불러오기
+  // diaryId가 바뀔 때 댓글 불러오기
   useEffect(() => {
     if (!diaryId) return;
+
     fetchComments(diaryId)
-      .then((data) => setComments(data))
-      .catch((e) => console.error(e));
+      .then(setComments)
+      .catch(console.error);
   }, [diaryId]);
 
+  if (!diaryId) {
+    return <div>다이어리를 찾을 수 없습니다. ID가 올바르지 않습니다.</div>;
+  }
+
+  // 하트 클릭 핸들러
   const handleHeartClick = () => {
     const updatedFilled = !heartFilled;
     const updatedCount = updatedFilled ? heartCount + 1 : heartCount - 1;
 
     setHeartFilled(updatedFilled);
     setHeartCount(updatedCount);
+
     localStorage.setItem("heartFilled", updatedFilled.toString());
     localStorage.setItem("heartCount", updatedCount.toString());
   };
 
+  // 댓글 작성 폼 제출
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    if (!commentInput.trim()) return;
+    const text = commentInput.trim();
+    if (!text || !diaryId) return;
 
     try {
-      const newComment = await postComment(diaryId, commentInput.trim());
+      const newComment = await postComment(diaryId, text);
       setComments((prev) => [...prev, newComment]);
       setCommentInput("");
-    } catch (e) {
-      alert(e.message);
+    } catch (err) {
+      console.error("댓글 작성 실패:", err);
     }
   };
 
+  // 대댓글 입력 변경
   const handleReplyChange = (commentId, value) => {
     setReplyInputs((prev) => ({ ...prev, [commentId]: value }));
   };
 
+  // 대댓글 작성 제출
   const handleReplySubmit = async (e, parentId) => {
     e.preventDefault();
     const replyText = replyInputs[parentId];
-    if (!replyText?.trim()) return;
+    if (!replyText?.trim() || !diaryId) return;
 
     try {
       const newReply = await postComment(diaryId, replyText.trim(), parentId);
@@ -131,16 +165,19 @@ function Scrap({ diaryId }) {
     }
   };
 
+  // 댓글 수정 모드 시작
   const handleEdit = (commentId, content) => {
     setEditStates((prev) => ({ ...prev, [commentId]: true }));
     setEditInputs((prev) => ({ ...prev, [commentId]: content }));
     setMenuOpen((prev) => ({ ...prev, [commentId]: false }));
   };
 
+  // 댓글 수정 입력 변경
   const handleEditChange = (commentId, value) => {
     setEditInputs((prev) => ({ ...prev, [commentId]: value }));
   };
 
+  // 댓글 수정 제출
   const handleEditSubmit = async (commentId) => {
     const newContent = editInputs[commentId]?.trim();
     if (!newContent) return;
@@ -156,6 +193,7 @@ function Scrap({ diaryId }) {
     }
   };
 
+  // 댓글 삭제
   const handleDelete = async (commentId) => {
     if (!window.confirm("댓글을 삭제하시겠습니까?")) return;
     try {
@@ -169,6 +207,7 @@ function Scrap({ diaryId }) {
     }
   };
 
+  // 메뉴 토글
   const toggleMenu = (commentId) => {
     setMenuOpen((prev) => ({
       ...prev,
@@ -176,6 +215,7 @@ function Scrap({ diaryId }) {
     }));
   };
 
+  // 최상위 댓글 필터링 및 대댓글 조회 함수
   const topLevelComments = comments.filter((c) => c.parentCommentId === null);
   const getReplies = (commentId) =>
     comments.filter((c) => c.parentCommentId === commentId);
@@ -199,19 +239,11 @@ function Scrap({ diaryId }) {
             <input placeholder="하하하" className={styles.input} readOnly />
 
             <div
-              style={{
-                marginTop: "10px",
-                display: "flex",
-                alignItems: "center",
-              }}
+              style={{ marginTop: "10px", display: "flex", alignItems: "center" }}
             >
               <Heart filled={heartFilled} onClick={handleHeartClick} />
               <span
-                style={{
-                  fontSize: "20px",
-                  fontWeight: "bold",
-                  marginRight: "10px",
-                }}
+                style={{ fontSize: "20px", fontWeight: "bold", marginRight: "10px" }}
               >
                 {heartCount}
               </span>
@@ -231,131 +263,69 @@ function Scrap({ diaryId }) {
               </button>
             </form>
 
-            {/* 댓글 목록 */}
-            <div className={styles.commentList}>
-              {topLevelComments.map((c) => (
-                <div key={c.id} className={styles.commentItem}>
+            {/* 댓글 리스트 */}
+            <div>
+              {topLevelComments.map((comment) => (
+                <div key={comment.id} className={styles.commentBox}>
                   <div className={styles.commentHeader}>
-                    <strong className={styles.commentAuthor}>{c.name}</strong>
-                    {editStates[c.id] ? (
-                      <>
-                        <input
-                          type="text"
-                          value={editInputs[c.id] || ""}
-                          onChange={(e) => handleEditChange(c.id, e.target.value)}
-                          className={styles.editInput}
-                        />
-                        <button
-                          onClick={() => handleEditSubmit(c.id)}
-                          className={styles.editBtn}
-                        >
-                          완료
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <span className={styles.commentContent}>{c.content}</span>
-                        {c.name === currentUserId && (
-                          <div className={styles.menuWrapper}>
-                            <button
-                              onClick={() => toggleMenu(c.id)}
-                              className={styles.menuBtn}
-                            >
-                              ...
-                            </button>
-                            {menuOpen[c.id] && (
-                              <div className={styles.menuBox}>
-                                <button
-                                  onClick={() => handleEdit(c.id, c.content)}
-                                  className={styles.menuOption}
-                                >
-                                  수정
-                                </button>
-                                <button
-                                  onClick={() => handleDelete(c.id)}
-                                  className={styles.menuOption}
-                                >
-                                  삭제
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-
-                  {/* 대댓글 목록 */}
-                  <div className={styles.replyList}>
-                    {getReplies(c.id).map((r) => (
-                      <div key={r.id} className={styles.replyItem}>
-                        <strong className={styles.commentAuthor}>{r.name}</strong>
-                        {editStates[r.id] ? (
+                    <span>{comment.writerNickname}</span>
+                    <span>{comment.createdAt}</span>
+                    <button onClick={() => toggleMenu(comment.id)}>…</button>
+                    {menuOpen[comment.id] && (
+                      <div className={styles.commentMenu}>
+                        {currentUserId === comment.writerId && (
                           <>
-                            <input
-                              type="text"
-                              value={editInputs[r.id] || ""}
-                              onChange={(e) => handleEditChange(r.id, e.target.value)}
-                              className={styles.editInput}
-                            />
                             <button
-                              onClick={() => handleEditSubmit(r.id)}
-                              className={styles.editBtn}
+                              onClick={() => handleEdit(comment.id, comment.content)}
                             >
-                              완료
+                              수정
                             </button>
-                          </>
-                        ) : (
-                          <>
-                            <span className={styles.commentContent}>{r.content}</span>
-                            {r.name === currentUserId && (
-                              <div className={styles.menuWrapper}>
-                                <button
-                                  onClick={() => toggleMenu(r.id)}
-                                  className={styles.menuBtn}
-                                >
-                                  ...
-                                </button>
-                                {menuOpen[r.id] && (
-                                  <div className={styles.menuBox}>
-                                    <button
-                                      onClick={() => handleEdit(r.id, r.content)}
-                                      className={styles.menuOption}
-                                    >
-                                      수정
-                                    </button>
-                                    <button
-                                      onClick={() => handleDelete(r.id)}
-                                      className={styles.menuOption}
-                                    >
-                                      삭제
-                                    </button>
-                                  </div>
-                                )}
-                              </div>
-                            )}
+                            <button onClick={() => handleDelete(comment.id)}>
+                              삭제
+                            </button>
                           </>
                         )}
                       </div>
-                    ))}
-
-                    {/* 대댓글 입력폼 */}
-                    <form
-                      onSubmit={(e) => handleReplySubmit(e, c.id)}
-                      className={styles.replyForm}
-                    >
-                      <input
-                        type="text"
-                        placeholder="답글 작성"
-                        value={replyInputs[c.id] || ""}
-                        onChange={(e) => handleReplyChange(c.id, e.target.value)}
-                        className={styles.replyInput}
-                      />
-                      <button type="submit" className={styles.replyBtn}>
-                        작성
-                      </button>
-                    </form>
+                    )}
                   </div>
+
+                  {editStates[comment.id] ? (
+                    <>
+                      <input
+                        value={editInputs[comment.id]}
+                        onChange={(e) => handleEditChange(comment.id, e.target.value)}
+                        className={styles.editInput}
+                      />
+                      <button onClick={() => handleEditSubmit(comment.id)}>저장</button>
+                    </>
+                  ) : (
+                    <p>{comment.content}</p>
+                  )}
+
+                  {/* 대댓글 리스트 */}
+                  {getReplies(comment.id).map((reply) => (
+                    <div key={reply.id} className={styles.replyBox}>
+                      <span>{reply.writerNickname}</span>
+                      <span>{reply.createdAt}</span>
+                      <p>{reply.content}</p>
+                    </div>
+                  ))}
+
+                  {/* 대댓글 입력폼 */}
+                  <form
+                    onSubmit={(e) => handleReplySubmit(e, comment.id)}
+                    className={styles.replyForm}
+                  >
+                    <input
+                      placeholder="답글 작성"
+                      value={replyInputs[comment.id] || ""}
+                      onChange={(e) => handleReplyChange(comment.id, e.target.value)}
+                      className={styles.replyInput}
+                    />
+                    <button type="submit" className={styles.replyBtn}>
+                      작성
+                    </button>
+                  </form>
                 </div>
               ))}
             </div>
@@ -366,4 +336,4 @@ function Scrap({ diaryId }) {
   );
 }
 
-export default Scrap;
+export default Write;
