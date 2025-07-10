@@ -19,7 +19,7 @@ export default function List() {
       }
 
       try {
-        const res = await api.get(`${API_BASE_URL}/posts/user/${userId}`, {
+        const res = await api.get(`/posts/user/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

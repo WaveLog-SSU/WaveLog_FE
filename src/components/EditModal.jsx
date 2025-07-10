@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import styles from "./EditModal.module.css";
 import api from "../api";
+import Editor from "react-simple-code-editor";
+import { highlight, languages } from "prismjs/components/prism-core";
+import "prismjs/components/prism-clike";
+import "prismjs/components/prism-javascript";
 
 function InlineEditableCategory({ initialCategory, onCategoryChange }) {
   const [category, setCategory] = useState(initialCategory);
@@ -149,14 +153,17 @@ function EditModal({
         />
 
         <label htmlFor="codeInput">코드</label>
-        <textarea
+        <Editor
           id="codeInput"
           value={code}
-          onChange={(e) => setCode(e.target.value)}
-          placeholder="코드를 작성하세요"
+          onValueChange={setCode}
+          highlight={code => highlight(code, languages.js)}
+          padding={0}
           className={styles.textareaCode}
+          placeholder="코드를 작성하세요"
           disabled={loading}
         />
+
 
         <label htmlFor="descInput">설명</label>
         <textarea
