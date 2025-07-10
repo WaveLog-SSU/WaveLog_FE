@@ -18,7 +18,29 @@
   margin-right: 40px;
 }
 
-/* 상단 메뉴: 고정 */
+/* 텍스트형 메뉴 버튼 상단 배치 */
+.topTextMenu {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* 텍스트 스타일 버튼 */
+.myButton {
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: #888;
+  transition: color 0.2s ease;
+}
+
+.myButton:hover {
+  color: #000;
+}
+
+/* 기존 상단 메뉴 */
 .topMenu {
   display: flex;
   gap: 10px;
@@ -43,7 +65,7 @@
   background: #ffffff;
   border-radius: 125px;
   box-shadow: -1px -1px 45px #00000026;
-  height: 550px; /* 맞춰진 높이 */
+  height: 550px;
   width: 100%;
 }
 
@@ -53,7 +75,7 @@
   flex-direction: column;
   align-items: center;
   flex: 1;
-  height: 550px; /* 왼쪽 콘텐츠 박스와 높이 동일 */
+  height: 550px;
   justify-content: space-between;
   gap: 20px;
 }
@@ -63,7 +85,7 @@
   cursor: pointer;
 }
 
-/* 프로필 이미지: 크게 */
+/* 프로필 이미지 */
 .profileImg {
   width: 350px;
   height: 350px;

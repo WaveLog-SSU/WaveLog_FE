@@ -28,7 +28,7 @@ function Signup() {
     }
 
     try {
-      const response = await axios.post("/api/members/register", {
+      const response = await axios.post("http://localhost:8080/api/members/register", {
         wavelogId: userId,
         name,
         password,

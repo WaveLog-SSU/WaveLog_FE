@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import styles from "./EditModal.module.css";
+import api from "../api";
 
 function InlineEditableCategory({ initialCategory, onCategoryChange }) {
   const [category, setCategory] = useState(initialCategory);
@@ -36,6 +37,7 @@ function EditModal({
   isOpen,
   onClose,
   onSave,
+  diaryId = null,
   initialTitle = "",
   initialCode = "",
   initialDesc = "",
@@ -48,6 +50,7 @@ function EditModal({
   const [description, setDescription] = useState(initialDesc);
   const [hashtags, setHashtags] = useState(initialHashtags.join(", "));
   const [dateStr, setDateStr] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -71,24 +74,20 @@ function EditModal({
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [
-    isOpen,
-    initialCategory,
-    initialTitle,
-    initialCode,
-    initialDesc,
-    initialHashtags,
-  ]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    const accessToken = localStorage.getItem("token");
+
     const hashtagArray = hashtags
       .split(",")
       .map((tag) => tag.trim())
       .filter((tag) => tag.length > 0);
 
     const data = {
+      diary_id: diaryId,
       memberId: 1,
       title,
       code,
@@ -97,17 +96,40 @@ function EditModal({
       hashtags: hashtagArray,
     };
 
-    onSave(data);
-    onClose();
+    try {
+      setLoading(true);
+      const response = await fetch("/diaries", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${accessToken}`,
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error(`서버 오류: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log("저장 성공:", result);
+
+      if (onSave) {
+        onSave(result);
+      }
+      onClose();
+    } catch (error) {
+      console.error("저장 실패:", error);
+      alert("글 저장에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <>
       <div className={styles.modalOverlay} onClick={onClose} />
-      <div
-        className={styles.modalContent}
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <div className={styles.titleRow}>
           <InlineEditableCategory
             initialCategory={category}
@@ -123,6 +145,7 @@ function EditModal({
           onChange={(e) => setTitle(e.target.value)}
           className={styles.titleInput}
           placeholder="제목을 입력하세요"
+          disabled={loading}
         />
 
         <label htmlFor="codeInput">코드</label>
@@ -132,6 +155,7 @@ function EditModal({
           onChange={(e) => setCode(e.target.value)}
           placeholder="코드를 작성하세요"
           className={styles.textareaCode}
+          disabled={loading}
         />
 
         <label htmlFor="descInput">설명</label>
@@ -141,6 +165,7 @@ function EditModal({
           onChange={(e) => setDescription(e.target.value)}
           placeholder="설명을 작성하세요"
           className={styles.textareaDesc}
+          disabled={loading}
         />
 
         <label htmlFor="hashtagInput">해시태그 (쉼표로 구분)</label>
@@ -150,11 +175,16 @@ function EditModal({
           onChange={(e) => setHashtags(e.target.value)}
           placeholder="예: C언어, 백엔드"
           className={styles.textareaHashtag}
+          disabled={loading}
         />
 
         <div className={styles.buttonRow}>
-          <button onClick={onClose}>취소</button>
-          <button onClick={handleSave}>저장</button>
+          <button onClick={onClose} disabled={loading}>
+            취소
+          </button>
+          <button onClick={handleSave} disabled={loading}>
+            {loading ? "저장 중..." : "저장"}
+          </button>
         </div>
       </div>
     </>
