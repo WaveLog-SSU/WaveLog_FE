@@ -1,6 +1,10 @@
 import styles from "./Write.module.css";
 import React, { useState, useEffect } from "react";
 import api from "../api";
+import { highlight, languages } from "prismjs/components/prism-core";
+import "prismjs/components/prism-clike";
+import "prismjs/components/prism-javascript";
+
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
@@ -229,7 +233,12 @@ function Write({ diaryId }) {
 
         <div className={styles["row-view"]}>
           <div className={styles.view2}>
-            <span className={styles.text2}>frintf...</span>
+            <pre
+          className={styles.codeBlock}
+          dangerouslySetInnerHTML={{
+            __html: highlight(text2, languages.js),
+          }}
+        />
           </div>
 
           <div className={styles.column}>
