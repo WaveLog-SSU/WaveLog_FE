@@ -229,3 +229,28 @@
   margin-right: 78px;
   box-shadow: -1px -1px 45px #00000026;
 }
+
+/* 코드블럭 */
+.codeBlock {
+  width: 100%;
+  min-height: 100px;
+  margin: 0;
+  padding: 12px;
+  border-radius: 6px;
+  background-color: #f6f8fa;
+  border: 1px solid #d0d7de;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+.codeBlock pre {
+  margin: 0;
+  background: transparent;
+  color: #24292f;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
