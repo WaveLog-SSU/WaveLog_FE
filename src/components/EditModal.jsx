@@ -7,6 +7,7 @@ import "prismjs/components/prism-clike";
 import "prismjs/components/prism-javascript";
 
 function InlineEditableCategory({ initialCategory, onCategoryChange }) {
+  const [editing, setEditing] = useState(false);
   const [category, setCategory] = useState(initialCategory);
   const inputRef = useRef(null);
 
@@ -15,7 +16,12 @@ function InlineEditableCategory({ initialCategory, onCategoryChange }) {
       inputRef.current.focus();
       inputRef.current.select();
     }
-  }, []);
+  }, [editing]);
+
+  const handleTextClick = () => {
+    setCategory("");
+    setEditing(true);
+  };
 
   useEffect(() => {
     setCategory(initialCategory);
@@ -26,14 +32,33 @@ function InlineEditableCategory({ initialCategory, onCategoryChange }) {
     onCategoryChange(e.target.value);
   };
 
-  return (
+  const handleBlur = () => {
+    setEditing(false);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      setEditing(false);
+    }
+  };
+
+  return editing ? (
     <input
       ref={inputRef}
       type="text"
       value={category}
       onChange={handleChange}
+      onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
       className={styles.categoryInput}
     />
+  ) : (
+    <span
+      onClick={handleTextClick}
+      className={styles.categoryText}
+    >
+      <strong>{category || "CATEGORY"}</strong>
+    </span>
   );
 }
 
@@ -83,7 +108,13 @@ function EditModal({
   if (!isOpen) return null;
 
   const handleSave = async () => {
-    const accessToken = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+
+    if (!token || !userId) {
+      alert("로그인 정보가 없습니다.");
+      return;
+    }
 
     const hashtagArray = hashtags
       .split(",")
@@ -91,8 +122,7 @@ function EditModal({
       .filter((tag) => tag.length > 0);
 
     const data = {
-      diary_id: diaryId,
-      memberId: 1,
+      memberId: Number(userId),
       title,
       code,
       content: description,
@@ -102,24 +132,19 @@ function EditModal({
 
     try {
       setLoading(true);
-      const response = await fetch("/diaries", {
-        method: "POST",
+      const response = await api.post("/diaries", data, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `${accessToken}`,
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(data),
       });
 
-      if (!response.ok) {
-        throw new Error(`서버 오류: ${response.status}`);
-      }
-
-      const result = await response.json();
+      const result = response.data;
       console.log("저장 성공:", result);
+      alert("글이 성공적으로 저장되었습니다!"); // ✅ 저장 성공 팝업
 
       if (onSave) {
-        onSave(result);
+        onSave(result); // 부모에게 새 글 데이터 전달
       }
       onClose();
     } catch (error) {
@@ -157,39 +182,47 @@ function EditModal({
           id="codeInput"
           value={code}
           onValueChange={setCode}
-          highlight={code => highlight(code, languages.js)}
+          highlight={(code) => highlight(code, languages.js)}
           padding={0}
           className={styles.textareaCode}
           placeholder="코드를 작성하세요"
           disabled={loading}
         />
 
-
         <label htmlFor="descInput">설명</label>
         <textarea
           id="descInput"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="설명을 작성하세요"
           className={styles.textareaDesc}
+          placeholder="설명을 작성하세요"
           disabled={loading}
         />
 
-        <label htmlFor="hashtagInput">해시태그 (쉼표로 구분)</label>
-        <textarea
-          id="hashtagInput"
+        <label htmlFor="hashtagsInput">해시태그 (쉼표로 구분)</label>
+        <input
+          id="hashtagsInput"
           value={hashtags}
           onChange={(e) => setHashtags(e.target.value)}
-          placeholder="예: C언어, 백엔드"
-          className={styles.textareaHashtag}
+          className={styles.hashtagInput}
+          placeholder="#예시, #테스트"
           disabled={loading}
         />
 
-        <div className={styles.buttonRow}>
-          <button onClick={onClose} disabled={loading}>
+        <div className={styles.buttonGroup}>
+          <button
+            className={styles.myButton}
+            onClick={onClose}
+            disabled={loading}
+          >
             취소
           </button>
-          <button onClick={handleSave} disabled={loading}>
+
+          <button
+            className={styles.myButton}
+            onClick={handleSave}
+            disabled={loading}
+          >
             {loading ? "저장 중..." : "저장"}
           </button>
         </div>

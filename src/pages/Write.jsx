@@ -4,7 +4,7 @@ import api from "../api";
 import { highlight, languages } from "prismjs/components/prism-core";
 import "prismjs/components/prism-clike";
 import "prismjs/components/prism-javascript";
-
+import { useParams } from 'react-router-dom';
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
@@ -35,8 +35,10 @@ function Heart({ filled, onClick }) {
   );
 }
 
-function Write({ diaryId }) {
-  console.log("diaryId:", diaryId); // diaryId 확인용
+function Write() {
+  const { diaryId } = useParams();
+  console.log("diaryId:", diaryId);
+
 
   // 상태 관리
   const [heartCount, setHeartCount] = useState(0);
@@ -233,12 +235,12 @@ function Write({ diaryId }) {
 
         <div className={styles["row-view"]}>
           <div className={styles.view2}>
-            <pre
+            {/* <pre
           className={styles.codeBlock}
           dangerouslySetInnerHTML={{
             __html: highlight(text2, languages.js),
           }}
-        />
+        />  */}
           </div>
 
           <div className={styles.column}>

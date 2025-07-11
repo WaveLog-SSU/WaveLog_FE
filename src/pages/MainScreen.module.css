@@ -18,14 +18,27 @@
   margin-right: 40px;
 }
 
-/* 텍스트형 메뉴 버튼 상단 배치 */
+/* 텍스트형 메뉴 버튼 줄: 좌우 분할 */
 .topTextMenu {
   display: flex;
-  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
 }
 
-/* 텍스트 스타일 버튼 */
+/* 왼쪽 메뉴 버튼 그룹 */
+.leftMenuGroup {
+  display: flex;
+  gap: 20px;
+}
+
+/* 오른쪽 로그인/로그아웃 버튼 */
+.rightMenuButton {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 공통 버튼 스타일 */
 .myButton {
   font-weight: bold;
   font-size: 1.1rem;
