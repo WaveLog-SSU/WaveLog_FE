@@ -8,7 +8,6 @@ import Write from "./pages/Write";
 import UserProfile from "./pages/UserProfile";
 import List from "./pages/List";
 import Bookmark from "./pages/Bookmark";
-import Quiz from "./pages/Quiz";
 
 import { AuthProvider } from "./contexts/AuthContext";
 
@@ -26,7 +25,6 @@ function App() {
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/list" element={<List />} />
         <Route path="/bookmark" element={<Bookmark />} />
-        <Route path="/quiz" element={<Quiz />} />
         <Route path="*" element={<div>404 Not Found</div>} />
       </Routes>
     </AuthProvider>

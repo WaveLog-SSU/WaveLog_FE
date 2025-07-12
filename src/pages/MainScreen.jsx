@@ -82,9 +82,6 @@ function MainScreen() {
             <button className={styles.myButton} onClick={() => openModal()}>
               WRITE
             </button>
-            <button className={styles.myButton} onClick={() => navigate("/quiz")}>
-              QUIZ
-            </button>
           </div>
 
           <div className={styles.rightMenuButton}>
