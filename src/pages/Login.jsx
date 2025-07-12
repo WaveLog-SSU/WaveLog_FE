@@ -27,7 +27,7 @@ function Login() {
 
       const { accessToken, grantType, memberId } = response.data;
       localStorage.setItem("userId", `${memberId}`);
-      localStorage.setItem("token", `${grantType} ${accessToken}`);
+      localStorage.setItem("token", `${accessToken}`);
 
       login();
       alert("로그인 성공!");
