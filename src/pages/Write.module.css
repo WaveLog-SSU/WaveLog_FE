@@ -83,12 +83,27 @@
   display: flex;
   align-items: center;
   margin-top: 20px;
+  gap: 16px;
+  z-index: 1;
+  position: relative;
 }
+
+/* ✅ 추가된 부분: 아이콘 wrapper */
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ✅ 수정: SVG 자체에도 cursor 부여 */
 .icon {
   width: 28px;
   height: 28px;
   cursor: pointer;
+  pointer-events: auto; /* 클릭 가능하게 보장 */
 }
+
 .iconText {
   margin: 0 12px 0 8px;
   font-size: 20px;

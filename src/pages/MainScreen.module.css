@@ -30,6 +30,27 @@
 .leftMenuGroup {
   display: flex;
   gap: 20px;
+  align-items: center;
+}
+
+/* BOOKMARK 버튼 래퍼 (배지와 위치 조정) */
+.bookmarkWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* 배지 스타일 */
+.badge {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background-color: #e74c3c;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 12px;
+  line-height: 1;
 }
 
 /* 오른쪽 로그인/로그아웃 버튼 */
@@ -51,35 +72,6 @@
 
 .myButton:hover {
   color: #000;
-}
-
-/* 기존 상단 메뉴 */
-.topMenu {
-  display: flex;
-  gap: 10px;
-  font-size: 10px;
-  color: #000000;
-  cursor: pointer;
-  justify-content: flex-start;
-  align-items: center;
-  height: 10px;
-  margin-bottom: 15px;
-}
-
-/* 메뉴 항목 */
-.menuItem {
-  font-size: 24px;
-  color: #000000;
-  cursor: pointer;
-}
-
-/* 콘텐츠 박스: 오른쪽 프로필+달력 총 높이와 맞춤 */
-.contentBox {
-  background: #ffffff;
-  border-radius: 125px;
-  box-shadow: -1px -1px 45px #00000026;
-  height: 550px;
-  width: 100%;
 }
 
 /* 오른쪽: 프로필 + 달력 수직 정렬 */

@@ -10,6 +10,7 @@ import UserProfile from "./pages/UserProfile";
 import List from "./pages/List";
 import Bookmark from "./pages/Bookmark";
 import Quiz from "./pages/Quiz";
+import DayList from "./components/DayList";
 
 import { AuthProvider } from "./contexts/AuthContext";
 import { DiaryProvider } from "./contexts/DiaryContext";
@@ -30,6 +31,7 @@ function App() {
           <Route path="/list" element={<List />} />
           <Route path="/bookmark" element={<Bookmark />} />
           <Route path="/quiz" element={<Quiz />} />
+          <Route path="/daylist" element={<DayList />} />
           <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
       </DiaryProvider>

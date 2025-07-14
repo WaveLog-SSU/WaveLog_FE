@@ -1,3 +1,4 @@
+/* 전체 화면 영역 */
 .ListScreen {
   position: fixed;
   top: 0;
@@ -7,17 +8,18 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: white;
-  z-index: 1000;
+  background-color: #fafafa; /* 약간 연한 배경 */
 }
 
-.div {
+/* 내부 컨테이너 */
+.container {
   width: 100%;
   max-width: 960px;
   padding: 40px 20px;
   box-sizing: border-box;
 }
 
+/* 제목 영역 */
 .view {
   display: flex;
   justify-content: center;
@@ -31,19 +33,22 @@
 }
 
 .title {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
   color: #333;
+  user-select: none;
 }
 
+/* 카드 캐러셀 영역 */
 .carouselWrapper {
   overflow-x: auto;
   white-space: nowrap;
   margin-top: 40px;
+  -webkit-overflow-scrolling: touch; /* 스무스 스크롤 */
 }
 
 .carouselWrapper::-webkit-scrollbar {
-  display: none;
+  display: none; /* 스크롤바 숨김 */
 }
 
 .carousel {
@@ -51,42 +56,62 @@
   gap: 20px;
 }
 
+/* 개별 포스트 카드 */
 .postCard {
   flex: 0 0 auto;
-  width: 350px;
-  height: 350px;
+  width: 320px;
+  height: 280px;
   padding: 20px;
-  border-radius: 30px;
+  border-radius: 25px;
   background-color: #f8f8f8;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .postCard:hover {
   transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
+/* 카드 내부 제목 */
 .postTitle {
   font-size: 18px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 10px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 12px;
+  user-select: none;
 }
 
+/* 카드 날짜 */
 .postDate {
   font-size: 12px;
   color: #888;
   margin-bottom: 10px;
+  font-style: italic;
+  user-select: none;
 }
 
+/* 카드 본문 내용 */
 .postContent {
   font-size: 14px;
   color: #555;
   flex-grow: 1;
   overflow: hidden;
   text-overflow: ellipsis;
+  user-select: text;
+}
+
+/* 좋아요 및 기타 푸터 */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: #e74c3c; /* 빨간색 강조 */
+  margin-top: 10px;
+  user-select: none;
 }
