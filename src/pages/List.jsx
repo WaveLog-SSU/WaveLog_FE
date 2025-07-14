@@ -102,15 +102,6 @@ export default function List() {
           </div>
         )}
       </div>
-
-      {/* EditModal 열기 */}
-      {modalOpen && (
-        <EditModal
-          isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
-          onSave={handleSave}  // 새 글 저장 후 posts 상태 업데이트 함수 전달
-        />
-      )}
     </div>
   );
 }

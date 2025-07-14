@@ -4,7 +4,7 @@ import { isToday, format } from 'date-fns';
 
 const WEEKDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
-export default function Calendar({ onSelect, selectedDate }) {
+export default function Calendar({ onSelect, selectedDate, list = [] }) {
   const {
     currentDate,
     weeks,
@@ -20,6 +20,9 @@ export default function Calendar({ onSelect, selectedDate }) {
     if (index < prevCount + currCount) return 'current';
     return 'next';
   };
+
+  // 날짜 문자열이 존재하는지 확인하는 Set
+  const writtenDates = new Set(list.map(item => item.date));
 
   return (
     <div className={styles.wrapper}>
@@ -44,13 +47,16 @@ export default function Calendar({ onSelect, selectedDate }) {
               const index = wIdx * 7 + dIdx;
               const type = getDayType(index);
 
+              const fullDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), date);
+              const formatted = format(fullDate, 'yyyy.MM.dd');
+
               const isTodayDate =
-                type === 'current' &&
-                isToday(new Date(currentDate.getFullYear(), currentDate.getMonth(), date));
+                type === 'current' && isToday(fullDate);
 
               const isSelectedDate =
-                type === 'current' &&
-                selectedDate === format(new Date(currentDate.getFullYear(), currentDate.getMonth(), date), 'yyyy.MM.dd');
+                type === 'current' && selectedDate === formatted;
+
+              const hasWriting = writtenDates.has(formatted);
 
               return (
                 <div
@@ -73,13 +79,12 @@ export default function Calendar({ onSelect, selectedDate }) {
                       newDate.setDate(date);
                       setCurrentDate(newDate);
                     } else {
-                      const fullDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), date);
-                      const formatted = format(fullDate, 'yyyy.MM.dd');
                       onSelect?.(formatted);
                     }
                   }}
                 >
-                  {date || ''}
+                  <div>{date || ''}</div>
+                  {hasWriting && <div className={styles.dot} />} {/* 여기 표시 */}
                 </div>
               );
             })}

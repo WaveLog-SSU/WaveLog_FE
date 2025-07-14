@@ -4,11 +4,11 @@ import axios from "axios";
 import styles from "./Signup.module.css";
 
 const profileImageUrls = [
-  "https://postimg.cc/5HQNPKnL",
-  "https://postimg.cc/SjhCMcxD",
-  "https://postimg.cc/YLRp45CK",
-  "https://postimg.cc/xNnf1fY3",
-  "https://postimg.cc/phDVvhNd"
+  "https://i.postimg.cc/rmHDSxQ5/Kakao-Talk-20250710-232308800-04.jpg",
+  "https://i.postimg.cc/HWJ2F2DD/Kakao-Talk-20250710-232308800-01.jpg",
+  "https://i.postimg.cc/K4S4WFXz/Kakao-Talk-20250710-232308800-02.jpg",
+  "https://i.postimg.cc/3NDd9NcV/Kakao-Talk-20250710-232308800-03.jpg",
+  "https://i.postimg.cc/9fJRQv98/Kakao-Talk-20250710-232308800.jpg"
 ];
 
 function Signup() {
