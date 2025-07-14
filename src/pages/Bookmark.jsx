@@ -6,19 +6,29 @@ import styles from "./Bookmark.module.css";
 export default function Bookmark() {
   const [bookmarkedDiaries, setBookmarkedDiaries] = useState([]);
   const [loading, setLoading] = useState(true);
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
-    api
-      .get("/bookmarks")  // 북마크된 글 목록 가져오기
-      .then((res) => {
-        setBookmarkedDiaries(res.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("북마크 목록 불러오기 실패", err);
-        setLoading(false);
+  const fetchBookmarkedDiaries = async () => {
+
+    if (!token) return;
+    try {
+      const res = await api.get("/bookmarks", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-  }, []);
+      setBookmarkedDiaries(res.data);
+      setLoading(false);
+    } catch (err) {
+      console.error("북마크 목록 불러오기 실패", err);
+      setLoading(false);
+    }
+  };
+
+  fetchBookmarkedDiaries();
+}, [token]);
+
 
   if (loading) return <div className={styles.ListScreen}>로딩 중...</div>;
 

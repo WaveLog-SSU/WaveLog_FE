@@ -3,22 +3,14 @@ import { useNavigate } from "react-router-dom";
 import Calendar from "../components/Calendar.jsx";
 import EditModal from "../components/EditModal.jsx";
 import SearchModal from "../components/SearchModal.jsx";
-import DayList from "../components/DayList.jsx"; 
+import DayList from "../components/DayList.jsx";
 import styles from "./MainScreen.module.css";
 import { useAuth } from "../contexts/AuthContext.jsx";
 import api from "../api.js";
 
-const profileImg =
+// 기본 프로필 이미지
+const defaultProfileImg =
   "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/Pj2S5T474o/ir4t7nuw_expires_30_days.png";
-
-const imageSets = {
-  "0-4": ["https://via.placeholder.com/80?text=A1"],
-  "5-9": ["https://via.placeholder.com/80?text=B1"],
-  "10-14": ["https://via.placeholder.com/80?text=C1"],
-  "15-19": ["https://via.placeholder.com/80?text=D1"],
-  "20-24": ["https://via.placeholder.com/80?text=E1"],
-  "25+": ["https://via.placeholder.com/80?text=F1"],
-};
 
 export default function MainScreen() {
   const navigate = useNavigate();
@@ -26,8 +18,8 @@ export default function MainScreen() {
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [selectedDiary, setSelectedDiary] = useState(null);
 
+  const [selectedDiary, setSelectedDiary] = useState(null);
   const [title, setTitle] = useState("");
   const [code, setCode] = useState("");
   const [desc, setDesc] = useState("");
@@ -38,12 +30,13 @@ export default function MainScreen() {
   const [bookmarkCount, setBookmarkCount] = useState(0);
 
   const [selectedDate, setSelectedDate] = useState("2025-07-13");
-
   const [diaries, setDiaries] = useState([]);
 
   const userId = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
+  const profileImg = localStorage.getItem("profileImg") || defaultProfileImg;
 
+  // 웨이브 및 북마크 수 가져오기
   useEffect(() => {
     if (!userId || !token) return;
 
@@ -55,30 +48,22 @@ export default function MainScreen() {
       .get(`/diaries/wave/${userId}?year=${year}&month=${month}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => {
-        setWaveCount(res.data.count ?? 0);
-      })
-      .catch(() => {
-        setWaveCount(0);
-      });
+      .then((res) => setWaveCount(res.data.count ?? 0))
+      .catch(() => setWaveCount(0));
 
     api
       .get(`/diaries/bookmark/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => {
-        setBookmarkCount(res.data.count ?? 0);
-      })
-      .catch(() => {
-        setBookmarkCount(0);
-      });
+      .then((res) => setBookmarkCount(res.data.count ?? 0))
+      .catch(() => setBookmarkCount(0));
   }, [userId, token]);
 
-  // 날짜 포맷 정리 (만약 '.' 있다면 '-'로 바꿈)
-  const formattedDate = selectedDate.replace(/\./g, "-");
-
+  // 선택한 날짜의 일기 목록 가져오기
   useEffect(() => {
     if (!token) return;
+
+    const formattedDate = selectedDate.replace(/\./g, "-");
 
     api
       .get(`/diaries?date=${formattedDate}`, {
@@ -86,7 +71,7 @@ export default function MainScreen() {
       })
       .then((res) => setDiaries(res.data))
       .catch(() => setDiaries([]));
-  }, [formattedDate, token]);
+  }, [selectedDate, token]);
 
   const getKey = (n) => {
     if (n < 5) return "0-4";
@@ -96,14 +81,26 @@ export default function MainScreen() {
     if (n < 25) return "20-24";
     return "25+";
   };
+
+  const imageSets = {
+    "0-4": ["https://via.placeholder.com/80?text=A1"],
+    "5-9": ["https://via.placeholder.com/80?text=B1"],
+    "10-14": ["https://via.placeholder.com/80?text=C1"],
+    "15-19": ["https://via.placeholder.com/80?text=D1"],
+    "20-24": ["https://via.placeholder.com/80?text=E1"],
+    "25+": ["https://via.placeholder.com/80?text=F1"],
+  };
+
   const currentImages = imageSets[getKey(waveCount)];
 
   const goToProfile = () => navigate("/profile");
+
   const handleLoginToggle = () => {
     if (isLoggedIn) {
       logout();
       localStorage.removeItem("token");
       localStorage.removeItem("userId");
+      localStorage.removeItem("profileImg"); // ✅ 프로필 이미지 제거
       alert("로그아웃 되었습니다.");
       navigate("/login");
     } else {
@@ -129,9 +126,11 @@ export default function MainScreen() {
     }
     setIsEditOpen(true);
   };
+
   const closeEditModal = () => setIsEditOpen(false);
   const openSearchModal = () => setIsSearchOpen(true);
   const closeSearchModal = () => setIsSearchOpen(false);
+
   const handleSave = (data) => {
     console.log("저장된 데이터:", data);
     closeEditModal();
@@ -143,32 +142,22 @@ export default function MainScreen() {
 
   return (
     <div className={styles.container}>
+      {/* 좌측 메뉴 */}
       <div className={styles.leftSection}>
         <div className={styles.imagePanel}>
           {currentImages.map((url, i) => (
-            <img
-              key={i}
-              src={url}
-              alt={`wave-img-${i}`}
-              className={styles.sideImage}
-            />
+            <img key={i} src={url} alt={`wave-img-${i}`} className={styles.sideImage} />
           ))}
         </div>
 
         <div className={styles.topTextMenu}>
           <div className={styles.leftMenuGroup}>
-            <button
-              className={styles.myButton}
-              onClick={() => navigate("/list")}
-            >
+            <button className={styles.myButton} onClick={() => navigate("/list")}>
               LIST
             </button>
 
             <div className={styles.bookmarkWrapper}>
-              <button
-                className={styles.myButton}
-                onClick={() => navigate("/bookmark")}
-              >
+              <button className={styles.myButton} onClick={() => navigate("/bookmark")}>
                 BOOKMARK
               </button>
               {bookmarkCount > 0 && (
@@ -179,9 +168,11 @@ export default function MainScreen() {
             <button className={styles.myButton} onClick={openSearchModal}>
               SEARCH
             </button>
+
             <button className={styles.myButton} onClick={() => openEditModal()}>
               WRITE
             </button>
+
             <button className={styles.myButton} onClick={() => navigate("/quiz")}>
               QUIZ
             </button>
@@ -195,6 +186,7 @@ export default function MainScreen() {
         </div>
       </div>
 
+      {/* 우측 콘텐츠 */}
       <div className={styles.rightSection}>
         <div className={styles.profileBox} onClick={goToProfile}>
           <img src={profileImg} alt="profile" className={styles.profileImg} />
@@ -219,6 +211,7 @@ export default function MainScreen() {
         </div>
       </div>
 
+      {/* 모달 영역 */}
       {isEditOpen && (
         <EditModal
           isOpen={isEditOpen}
